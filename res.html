@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bella | Authentic Italian Cuisine</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400..900&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Tuscan Sunset -->
+    <!-- Application Structure Plan: A single-page application with a clear, linear flow that guides the user from discovery to action. The structure is: Hero (attracts user), About (builds connection), Menu (core offering), Order (call-to-action), and Footer (contact). This logical progression makes navigation intuitive. A sticky header provides constant access to all sections, and the interactive cart sidebar offers immediate feedback, enhancing the user journey from browsing to purchasing. -->
+    <!-- Visualization & Content Choices: The menu is presented as a visual grid (Goal: Organize/Compare), using images and hover effects (Interaction: Explore) to make browsing engaging. The ordering system (Goal: Action) uses a multi-step form with a progress bar (Visualization: Process Flow) and a dynamic cart (Visualization: Real-time Data), providing clear feedback. Animations on buttons (confetti, bounce) are chosen to create a positive, rewarding user experience. This structure supports the primary goal of converting visitors into customers. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #FDFCF8;
+            color: #44403c; /* A slightly softer black - stone-700 */
+        }
+        h1, h2, h3, .font-display {
+            font-family: 'Playfair Display', serif;
+        }
+        .hero-section {
+            background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://images.unsplash.com/photo-1513104890138-7c749659a591?q=80&w=2070&auto=format&fit=crop') no-repeat center center/cover;
+        }
+        .sticky-nav {
+            transform: translateY(-100%);
+            animation: slideDown 0.5s forwards ease-out;
+        }
+        .fade-in-up {
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeInUp 1s forwards ease-out;
+        }
+        .menu-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+        }
+        .pulse-animate {
+            animation: pulse 2s infinite;
+        }
+        .add-to-cart-btn.bounce {
+            animation: bounce 0.4s ease-out;
+        }
+        .confetti {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background-color: #f00;
+            opacity: 0;
+            animation: confetti-burst 0.8s ease-out forwards;
+        }
+
+        /* New styles for menu filter and animations */
+        .filter-btn {
+            transition: all 0.3s ease;
+        }
+        .filter-btn.active {
+            background-color: #991b1b; /* red-800 */
+            color: white;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+
+        /* Reveal on scroll animation */
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 0.8s ease-out, transform 0.6s ease-out;
+        }
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-100%); }
+            to { transform: translateY(0); }
+        }
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        @keyframes confetti-burst {
+            0% {
+                transform: translate(0, 0) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(var(--x), var(--y)) rotate(360deg);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body class="text-stone-800">
+
+    <!-- Header & Navigation -->
+    <header id="header" class="fixed top-0 left-0 right-0 z-50 transition-all duration-300">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="#home" class="text-3xl font-bold font-display text-white">Bella</a>
+            <div class="hidden md:flex space-x-8">
+                <a href="#home" class="text-white hover:text-amber-300 transition">Home</a>
+                <a href="#about" class="text-white hover:text-amber-300 transition">About</a>
+                <a href="#menu" class="text-white hover:text-amber-300 transition">Menu</a>
+                <a href="#testimonials" class="text-white hover:text-amber-300 transition">Reviews</a>
+                <a href="#reservations" class="text-white hover:text-amber-300 transition">Reservations</a>
+                <a href="#order" class="text-white hover:text-amber-300 transition">Order Online</a>
+            </div>
+            <button id="mobile-menu-btn" class="md:hidden text-white text-2xl">☰</button>
+        </nav>
+         <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-stone-800 bg-opacity-90">
+            <a href="#home" class="block text-white text-center py-3">Home</a>
+            <a href="#about" class="block text-white text-center py-3">About</a>
+            <a href="#menu" class="block text-white text-center py-3">Menu</a>
+            <a href="#testimonials" class="block text-white text-center py-3">Reviews</a>
+            <a href="#reservations" class="block text-white text-center py-3">Reservations</a>
+            <a href="#order" class="block text-white text-center py-3">Order Online</a>
+        </div>
+    </header>
+
+    <main>
+        <!-- Hero Section -->
+        <section id="home" class="hero-section h-screen flex items-center justify-center">
+            <div class="text-center text-white">
+                <h1 class="text-6xl md:text-8xl font-extrabold font-display fade-in-up" style="animation-delay: 0.2s;">Bella</h1>
+                <p class="text-xl md:text-3xl mt-4 fade-in-up" style="animation-delay: 0.6s;">Savor Authentic Italian Flavors</p>
+            </div>
+        </section>
+
+        <!-- About Us Section -->
+        <section id="about" class="py-20 bg-stone-50">
+            <div class="container mx-auto px-6 text-center">
+                <h2 class="text-4xl font-bold font-display mb-4 reveal">Our Story</h2>
+                <p class="max-w-3xl mx-auto text-stone-600 leading-relaxed reveal" style="transition-delay: 100ms;">
+                    Born from a passion for authentic Italian cuisine, Bella brings the heart of Italy to your table. Our family recipes, passed down through generations, are crafted with the freshest local ingredients and a sprinkle of love. We believe every meal is a celebration, a moment to connect and create memories. Join us for a culinary journey that feels like coming home.
+                </p>
+                <div class="mt-16 grid md:grid-cols-2 gap-12 items-center text-left">
+                    <div class="reveal" style="transition-delay: 200ms;">
+                        <img src="https://images.unsplash.com/photo-1555939594-58d7cb561ad1?q=80&w=1887&auto=format&fit=crop" alt="Chef preparing food" class="rounded-lg shadow-xl w-full">
+                    </div>
+                    <div class="reveal" style="transition-delay: 300ms;">
+                        <h3 class="text-3xl font-display font-bold mb-4">Our Philosophy</h3>
+                        <p class="text-stone-600 mb-4">We are committed to simplicity and flavor. For us, great Italian food isn't about complexity; it's about honoring the quality of the ingredients. From hand-stretched pizza dough to slow-simmered sauces, we put care into every step, ensuring a taste that is both rustic and refined.</p>
+                        <h3 class="text-3xl font-display font-bold mt-8 mb-4">Meet the Chef</h3>
+                        <p class="text-stone-600">Chef Marco Bianchi, a native of Tuscany, leads our kitchen with a philosophy of "cucina povera," turning simple ingredients into extraordinary dishes. His passion is evident in every plate that leaves his kitchen. </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- Menu Section -->
+        <section id="menu" class="py-20">
+            <div class="container mx-auto px-6">
+                <h2 class="text-4xl font-bold font-display text-center mb-6 reveal">Our Menu</h2>
+                <div id="menu-filters" class="flex flex-wrap justify-center gap-2 md:gap-4 mb-10 reveal" style="transition-delay: 100ms;">
+                    <button class="filter-btn active px-4 py-2 rounded-full font-semibold border-2 border-stone-300 text-stone-600" data-filter="all">All</button>
+                    <button class="filter-btn px-4 py-2 rounded-full font-semibold border-2 border-stone-300 text-stone-600" data-filter="pizza">Pizza</button>
+                    <button class="filter-btn px-4 py-2 rounded-full font-semibold border-2 border-stone-300 text-stone-600" data-filter="pasta">Pasta</button>
+                    <button class="filter-btn px-4 py-2 rounded-full font-semibold border-2 border-stone-300 text-stone-600" data-filter="dessert">Desserts</button>
+                </div>
+                <div id="menu-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+                    <!-- Menu items will be injected here by JS -->
+                </div>
+            </div>
+        </section>
+        
+        <!-- Testimonials Section -->
+        <section id="testimonials" class="py-20 bg-stone-50">
+            <div class="container mx-auto px-6">
+                <h2 class="text-4xl font-bold font-display text-center mb-12 reveal">What Our Guests Say</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div class="bg-white p-6 rounded-lg shadow-lg reveal" style="transition-delay: 100ms;">
+                        <p class="text-stone-600 italic">"An absolute gem! The Carbonara was the best I've had outside of Rome. The atmosphere is warm and inviting. We'll be back!"</p>
+                        <p class="font-bold text-right mt-4 text-red-800">- The Johnson Family</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-lg reveal" style="transition-delay: 200ms;">
+                        <p class="text-stone-600 italic">"Bella is our new favorite spot for date night. The pizza is phenomenal, and the Tiramisu is to die for. 5 stars!"</p>
+                        <p class="font-bold text-right mt-4 text-red-800">- Sarah L.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-lg reveal" style="transition-delay: 300ms;">
+                        <p class="text-stone-600 italic">"Incredible service and even better food. You can taste the quality and passion in every bite. Highly recommend the Lasagna."</p>
+                        <p class="font-bold text-right mt-4 text-red-800">- Michael B.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Reservations Section -->
+        <section id="reservations" class="py-20">
+            <div class="container mx-auto px-6 max-w-3xl">
+                <h2 class="text-4xl font-bold font-display text-center mb-8 reveal">Make a Reservation</h2>
+                 <div id="reservation-form-container" class="bg-white p-8 rounded-lg shadow-lg reveal" style="transition-delay: 100ms;">
+                    <form id="reservation-form" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <input type="text" placeholder="Full Name" required class="p-3 border border-stone-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-800">
+                        <input type="email" placeholder="Email Address" required class="p-3 border border-stone-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-800">
+                        <input type="tel" placeholder="Phone Number" required class="p-3 border border-stone-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-800">
+                        <input type="number" placeholder="Number of Guests" min="1" required class="p-3 border border-stone-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-800">
+                        <input type="date" placeholder="Date" required class="p-3 border border-stone-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-800">
+                        <input type="time" placeholder="Time" required class="p-3 border border-stone-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-800">
+                        <button type="submit" class="md:col-span-2 w-full bg-red-800 text-white py-3 rounded-lg hover:bg-red-900 transition font-semibold">Book Table</button>
+                    </form>
+                </div>
+                <div id="reservation-confirmation" class="hidden text-center bg-green-100 text-green-800 p-8 rounded-lg shadow-lg">
+                    <h3 class="text-2xl font-display font-bold">Thank You!</h3>
+                    <p class="mt-2">Your reservation has been received. We look forward to seeing you!</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Order Section -->
+        <section id="order" class="py-20 bg-stone-50">
+            <div class="container mx-auto px-6">
+                <h2 class="text-4xl font-bold font-display text-center mb-12 reveal">Order Online</h2>
+                <div class="flex flex-col lg:flex-row gap-12">
+                    <!-- Order Form -->
+                    <div class="lg:w-2/3 reveal" style="transition-delay: 100ms;">
+                        <div id="checkout-progress" class="w-full mb-8">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="step active" data-step="1">Details</span>
+                                <span class="step" data-step="2">Payment</span>
+                                <span class="step" data-step="3">Confirmation</span>
+                            </div>
+                            <div class="bg-stone-200 rounded-full h-2.5">
+                                <div id="progress-bar" class="bg-red-800 h-2.5 rounded-full" style="width: 33%;"></div>
+                            </div>
+                        </div>
+
+                        <!-- Step 1: Details -->
+                        <div id="step-1" class="checkout-step">
+                            <h3 class="text-2xl font-display mb-6">Your Details</h3>
+                            <form class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <input type="text" placeholder="First Name" class="p-3 border border-stone-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-800">
+                                <input type="text" placeholder="Last Name" class="p-3 border border-stone-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-800">
+                                <input type="email" placeholder="Email Address" class="md:col-span-2 p-3 border border-stone-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-800">
+                                <input type="tel" placeholder="Phone Number" class="md:col-span-2 p-3 border border-stone-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-800">
+                                <button type="button" class="next-step-btn md:col-span-2 w-full bg-red-800 text-white py-3 rounded-lg hover:bg-red-900 transition" data-next="2">Next: Payment</button>
+                            </form>
+                        </div>
+                         <!-- Step 2: Payment -->
+                        <div id="step-2" class="checkout-step hidden">
+                            <h3 class="text-2xl font-display mb-6">Payment Information</h3>
+                            <form class="space-y-6">
+                                <input type="text" placeholder="Card Number" class="w-full p-3 border border-stone-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-800">
+                                <div class="flex gap-6">
+                                    <input type="text" placeholder="MM / YY" class="w-1/2 p-3 border border-stone-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-800">
+                                    <input type="text" placeholder="CVC" class="w-1/2 p-3 border border-stone-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-800">
+                                </div>
+                                <input type="text" placeholder="Name on Card" class="w-full p-3 border border-stone-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-800">
+                                <div class="flex gap-4">
+                                     <button type="button" class="prev-step-btn w-1/2 bg-stone-500 text-white py-3 rounded-lg hover:bg-stone-600 transition" data-prev="1">Back</button>
+                                     <button type="button" class="next-step-btn w-1/2 bg-red-800 text-white py-3 rounded-lg hover:bg-red-900 transition font-semibold" data-next="3">Place Order</button>
+                                </div>
+                            </form>
+                        </div>
+                        <!-- Step 3: Confirmation -->
+                        <div id="step-3" class="checkout-step hidden text-center">
+                            <h3 class="text-3xl font-display text-green-700 mb-4">Thank You!</h3>
+                            <p class="text-stone-600">Your order has been placed successfully.</p>
+                            <p class="text-stone-600 mt-2">We'll notify you when it's ready for pickup!</p>
+                            <button type="button" class="start-over-btn mt-6 bg-red-800 text-white py-3 px-8 rounded-lg hover:bg-red-900 transition font-semibold" data-start="1">Start New Order</button>
+                        </div>
+                    </div>
+
+                    <!-- Cart Sidebar -->
+                    <div class="lg:w-1/3 p-6 bg-white rounded-lg shadow-lg h-fit sticky top-28 reveal" style="transition-delay: 200ms;">
+                        <h3 class="text-2xl font-display border-b border-stone-200 pb-4 mb-4">Your Cart</h3>
+                        <div id="cart-items" class="space-y-4 max-h-96 overflow-y-auto pr-2">
+                           <p class="text-stone-500 text-center">Your cart is empty.</p>
+                        </div>
+                        <div id="cart-total-section" class="border-t border-stone-200 pt-4 mt-6 hidden">
+                            <div class="flex justify-between font-bold text-lg">
+                                <span>Total:</span>
+                                <span id="cart-total">$0.00</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-stone-900 text-white py-12">
+        <div class="container mx-auto px-6 text-center">
+            <p class="font-display text-2xl mb-4">Bella</p>
+            <div class="text-stone-400">
+                <p>123 Pasta Lane, Flavor Town, 12345 | (555) 123-4567</p>
+                <p class="mt-2 font-semibold">Opening Hours:</p>
+                <p>Mon - Fri: 5pm - 10pm | Sat - Sun: 12pm - 11pm</p>
+            </div>
+            <div class="flex justify-center space-x-6 mt-6">
+                <a href="#" class="text-2xl hover:text-amber-300 transition pulse-animate">FB</a>
+                <a href="#" class="text-2xl hover:text-amber-300 transition pulse-animate" style="animation-delay: 0.2s;">IG</a>
+                <a href="#" class="text-2xl hover:text-amber-300 transition pulse-animate" style="animation-delay: 0.4s;">TW</a>
+            </div>
+            <p class="text-stone-500 mt-8 text-sm">&copy; 2025 Bella. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+
+        const menuItems = [
+            { id: 1, name: 'Margherita Pizza', category: 'pizza', description: 'Classic pizza with San Marzano tomatoes, fresh mozzarella, basil, and a drizzle of olive oil.', price: 14.50, image: 'https://placehold.co/600x400/E84A3C/FFFFFF?text=Margherita' },
+            { id: 2, name: 'Spaghetti Carbonara', category: 'pasta', description: 'A Roman classic with crispy guanciale, pecorino cheese, fresh eggs, and black pepper.', price: 18.00, image: 'https://placehold.co/600x400/F2A516/FFFFFF?text=Carbonara' },
+            { id: 3, name: 'Lasagna Bolognese', category: 'pasta', description: 'Layers of fresh pasta, rich beef and pork ragu, béchamel sauce, and Parmigiano-Reggiano.', price: 20.00, image: 'https://placehold.co/600x400/34823D/FFFFFF?text=Lasagna' },
+            { id: 4, name: 'Fettuccine Alfredo', category: 'pasta', description: 'Creamy and rich pasta dish made with butter, heavy cream, and Parmigiano-Reggiano cheese.', price: 17.50, image: 'https://placehold.co/600x400/46322B/FFFFFF?text=Alfredo' },
+            { id: 5, name: 'Tiramisu', category: 'dessert', description: 'Classic Italian dessert with coffee-soaked ladyfingers, mascarpone cream, and cocoa powder.', price: 9.00, image: 'https://placehold.co/600x400/8C6D5A/FFFFFF?text=Tiramisu' },
+            { id: 6, name: 'Bruschetta', category: 'appetizer', description: 'Grilled bread rubbed with garlic and topped with fresh tomatoes, basil, and olive oil.', price: 8.50, image: 'https://placehold.co/600x400/C23B22/FFFFFF?text=Bruschetta' },
+            { id: 7, name: 'Pepperoni Pizza', category: 'pizza', description: 'A crowd-pleaser with spicy pepperoni, mozzarella, and our signature tomato sauce.', price: 16.00, image: 'https://placehold.co/600x400/D94A2E/FFFFFF?text=Pepperoni' },
+            { id: 8, name: 'Panna Cotta', category: 'dessert', description: 'Silky smooth cooked cream dessert, served with a berry coulis.', price: 8.00, image: 'https://placehold.co/600x400/EFE0D3/333333?text=Panna+Cotta' }
+        ];
+
+        let cart = [];
+
+        const menuGrid = document.getElementById('menu-grid');
+        const cartItemsContainer = document.getElementById('cart-items');
+        const cartTotalEl = document.getElementById('cart-total');
+        const cartTotalSection = document.getElementById('cart-total-section');
+        const menuFilters = document.getElementById('menu-filters');
+        
+        // Populate Menu
+        function renderMenu(filter = 'all') {
+            const filteredItems = filter === 'all' 
+                ? menuItems 
+                : menuItems.filter(item => item.category === filter);
+
+            menuGrid.innerHTML = filteredItems.map(item => `
+                <div class="menu-card bg-white rounded-lg shadow-md overflow-hidden transition-all duration-300">
+                    <img src="${item.image}" alt="${item.name}" class="w-full h-48 object-cover">
+                    <div class="p-6">
+                        <h3 class="text-2xl font-bold font-display">${item.name}</h3>
+                        <p class="text-stone-600 mt-2">${item.description}</p>
+                        <div class="flex justify-between items-center mt-4">
+                            <span class="text-xl font-bold font-display text-red-800">$${item.price.toFixed(2)}</span>
+                            <button class="add-to-cart-btn bg-red-800 text-white px-4 py-2 rounded-lg hover:bg-red-900 transition relative font-semibold" data-id="${item.id}">
+                                Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Menu filter logic
+        menuFilters.addEventListener('click', e => {
+            if (e.target.tagName === 'BUTTON') {
+                document.querySelector('.filter-btn.active').classList.remove('active');
+                e.target.classList.add('active');
+                renderMenu(e.target.dataset.filter);
+            }
+        });
+
+        // Render Cart
+        function renderCart() {
+            if (cart.length === 0) {
+                cartItemsContainer.innerHTML = '<p class="text-stone-500 text-center">Your cart is empty.</p>';
+                cartTotalSection.classList.add('hidden');
+                return;
+            }
+
+            cartItemsContainer.innerHTML = cart.map(cartItem => {
+                const menuItem = menuItems.find(item => item.id === cartItem.id);
+                return `
+                    <div class="flex justify-between items-center text-sm">
+                        <div class="w-2/3">
+                            <p class="font-bold truncate">${menuItem.name}</p>
+                            <div class="flex items-center gap-2 mt-1">
+                                <button class="cart-quantity-btn w-5 h-5 bg-stone-200 rounded-full font-bold" data-id="${cartItem.id}" data-change="-1">-</button>
+                                <span>${cartItem.quantity}</span>
+                                <button class="cart-quantity-btn w-5 h-5 bg-stone-200 rounded-full font-bold" data-id="${cartItem.id}" data-change="1">+</button>
+                                <button class="cart-remove-btn text-red-600 font-bold ml-2" data-id="${cartItem.id}">×</button>
+                            </div>
+                        </div>
+                        <span class="font-semibold w-1/3 text-right">$${(menuItem.price * cartItem.quantity).toFixed(2)}</span>
+                    </div>
+                `;
+            }).join('');
+
+            const total = cart.reduce((sum, cartItem) => {
+                const menuItem = menuItems.find(item => item.id === cartItem.id);
+                return sum + (menuItem.price * cartItem.quantity);
+            }, 0);
+            
+            cartTotalEl.textContent = `$${total.toFixed(2)}`;
+            cartTotalSection.classList.remove('hidden');
+        }
+
+        // Cart interaction logic
+        cartItemsContainer.addEventListener('click', e => {
+            const target = e.target;
+            const itemId = parseInt(target.dataset.id);
+
+            if (target.classList.contains('cart-quantity-btn')) {
+                const change = parseInt(target.dataset.change);
+                const itemInCart = cart.find(item => item.id === itemId);
+                if (itemInCart) {
+                    itemInCart.quantity += change;
+                    if (itemInCart.quantity <= 0) {
+                        cart = cart.filter(item => item.id !== itemId);
+                    }
+                }
+            }
+            
+            if (target.classList.contains('cart-remove-btn')) {
+                cart = cart.filter(item => item.id !== itemId);
+            }
+            
+            renderCart();
+        });
+
+        // Add to cart logic
+        menuGrid.addEventListener('click', e => {
+            if (e.target.classList.contains('add-to-cart-btn')) {
+                const btn = e.target;
+                const itemId = parseInt(btn.dataset.id);
+                
+                const existingItem = cart.find(item => item.id === itemId);
+                if (existingItem) {
+                    existingItem.quantity++;
+                } else {
+                    cart.push({ id: itemId, quantity: 1 });
+                }
+                
+                btn.classList.add('bounce');
+                createConfetti(btn);
+                setTimeout(() => btn.classList.remove('bounce'), 400);
+
+                renderCart();
+            }
+        });
+
+        // Confetti animation
+        function createConfetti(button) {
+            const rect = button.getBoundingClientRect();
+            const x = rect.left + rect.width / 2;
+            const y = rect.top + rect.height / 2;
+
+            for (let i = 0; i < 30; i++) {
+                const confetti = document.createElement('div');
+                confetti.classList.add('confetti');
+                document.body.appendChild(confetti);
+                
+                const colors = ['#f44336', '#ffeb3b', '#4caf50', '#2196f3', '#ffffff'];
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.left = `${x}px`;
+                confetti.style.top = `${y}px`;
+                
+                const randomX = (Math.random() - 0.5) * 200;
+                const randomY = (Math.random() - 0.7) * 200;
+                
+                confetti.style.setProperty('--x', `${randomX}px`);
+                confetti.style.setProperty('--y', `${randomY}px`);
+
+                setTimeout(() => confetti.remove(), 800);
+            }
+        }
+        
+        // Sticky Header Logic
+        const header = document.getElementById('header');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                header.classList.add('bg-stone-900', 'shadow-lg', 'sticky-nav');
+            } else {
+                header.classList.remove('bg-stone-900', 'shadow-lg', 'sticky-nav');
+            }
+        });
+
+        // Mobile Menu Toggle
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        mobileMenuBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+        
+        // Close mobile menu on link click
+        mobileMenu.addEventListener('click', (e) => {
+            if (e.target.tagName === 'A') {
+                mobileMenu.classList.add('hidden');
+            }
+        });
+
+        // Checkout Steps Logic
+        const checkoutSteps = document.querySelectorAll('.checkout-step');
+        const progressSteps = document.querySelectorAll('#checkout-progress .step');
+        const progressBar = document.getElementById('progress-bar');
+        
+        document.body.addEventListener('click', e => {
+            if (e.target.matches('.next-step-btn, .prev-step-btn, .start-over-btn')) {
+                const currentStepEl = e.target.closest('.checkout-step');
+                const targetStep = e.target.dataset.next || e.target.dataset.prev || e.target.dataset.start;
+                
+                if (targetStep) {
+                    currentStepEl.classList.add('hidden');
+                    document.getElementById(`step-${targetStep}`).classList.remove('hidden');
+                    updateProgress(targetStep);
+                    if (targetStep === '1') { // Reset cart if starting over
+                         cart = [];
+                         renderCart();
+                    }
+                }
+            }
+        });
+        
+        function updateProgress(currentStep) {
+            progressSteps.forEach(step => {
+                step.classList.remove('active');
+                if (parseInt(step.dataset.step) <= parseInt(currentStep)) {
+                    step.classList.add('active');
+                }
+            });
+            const progressWidth = ((parseInt(currentStep) -1) / (progressSteps.length -1)) * 67 + 33;
+            if (parseInt(currentStep) === 1) progressBar.style.width = '33%';
+            else if (parseInt(currentStep) === 2) progressBar.style.width = '66%';
+            else if(parseInt(currentStep) === 3) progressBar.style.width = '100%';
+        }
+
+        // Reservation Form Logic
+        const reservationForm = document.getElementById('reservation-form');
+        const reservationFormContainer = document.getElementById('reservation-form-container');
+        const reservationConfirmation = document.getElementById('reservation-confirmation');
+        reservationForm.addEventListener('submit', e => {
+            e.preventDefault();
+            reservationFormContainer.classList.add('hidden');
+            reservationConfirmation.classList.remove('hidden');
+        });
+
+        // Scroll Animation Logic
+        const revealElements = document.querySelectorAll('.reveal');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    // observer.unobserve(entry.target);
+                }
+            });
+        }, {
+            threshold: 0.1
+        });
+
+        revealElements.forEach(el => observer.observe(el));
+        
+        // Initial render
+        renderMenu();
+        renderCart();
+    });
+    </script>
+</body>
+</html>
+
